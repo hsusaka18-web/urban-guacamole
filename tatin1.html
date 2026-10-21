@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>သီတင်းကျွတ် အမှတ်တရ မီးထွန်းပွဲတော် 🪔✨</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Padauk', 'Pyidaungsu', 'Segoe UI', Tahoma, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(to bottom, #0f172a, #1e1b4b, #31103f);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Canvas Lantern & Fireworks Background - Placed on Top for Fireworks Visibility */
+        #lanternCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 650px;
+            margin: 0 auto;
+            padding: 15px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* Smooth Page Transition Animation */
+        .page {
+            display: none;
+            width: 100%;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .page.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Card Box Styling */
+        .card-section {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 25px 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+            width: 100%;
+        }
+
+        h1 {
+            color: #fde047;
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            text-shadow: 0 0 10px rgba(253, 224, 71, 0.5);
+        }
+
+        .subtitle {
+            color: #cbd5e1;
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+        }
+
+        /* Navigation Arrows */
+        .nav-btn-container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .nav-btn {
+            background: rgba(254, 240, 138, 0.2);
+            border: 1px solid #fde047;
+            color: #fde047;
+            padding: 8px 18px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: #fde047;
+            color: #0f172a;
+            box-shadow: 0 0 15px rgba(253, 224, 71, 0.6);
+        }
+
+        /* Moon Container (Centered Moon + Right Side Text without Emoji) */
+        .moon-container-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+
+        .moon-large {
+            width: 100px;
+            height: 100px;
+            background: #fef08a;
+            border-radius: 50%;
+            box-shadow: 0 0 45px #fef08a, 0 0 90px #fef08a;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .moon-container-row:hover .moon-large {
+            transform: scale(1.08);
+            box-shadow: 0 0 60px #fef08a, 0 0 110px #fde047;
+        }
+
+        .moon-side-text {
+            color: #fde047;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-shadow: 0 0 8px rgba(253, 224, 71, 0.6);
+            text-align: left;
+        }
+
+        /* Envelope Styling with Smooth Exit Animation */
+        .envelope-container {
+            position: relative;
+            width: 100%;
+            max-width: 300px;
+            height: 160px;
+            margin: 15px auto;
+            cursor: pointer;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .envelope-container.hide-envelope {
+            opacity: 0;
+            transform: translateY(40px) scale(0.9);
+            pointer-events: none;
+            height: 0;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .envelope {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: #b45309;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-top: 90px solid #d97706;
+        }
+
+        .envelope-label {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #fef08a;
+            font-weight: bold;
+            font-size: 0.95rem;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+            white-space: nowrap;
+        }
+
+        /* Smooth Secret Message Entrance Animation */
+        .secret-message {
+            display: none;
+            opacity: 0;
+            transform: translateY(-20px);
+            margin-top: 15px;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px dashed #fde047;
+            padding: 18px;
+            border-radius: 15px;
+            color: #f8fafc;
+            line-height: 1.8;
+            text-align: justify;
+            font-size: 0.95rem;
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .secret-message.show {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Input & Button */
+        input[type="text"] {
+            width: 85%;
+            padding: 10px 15px;
+            border-radius: 25px;
+            border: none;
+            outline: none;
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #eab308, #ca8a04);
+            color: #fff;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(234, 179, 8, 0.4);
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(234, 179, 8, 0.6);
+        }
+
+        /* Realistic SVG Sky Lantern Animation - Starts immediately & floats smoothly */
+        .real-flying-lantern {
+            position: fixed;
+            z-index: 50;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: flyUpSteady 8s linear forwards;
+            opacity: 1 !important;
+        }
+
+        @keyframes flyUpSteady {
+            0% {
+                transform: translateY(20px) scale(0.7);
+                opacity: 0;
+            }
+            8% {
+                opacity: 1;
+                transform: translateY(0) scale(0.85);
+            }
+            100% {
+                transform: translateY(-120vh) scale(1.15);
+                opacity: 1;
+            }
+        }
+
+        /* Evasion Game & GIF */
+        .game-box {
+            position: relative;
+            min-height: 200px;
+        }
+
+        .cute-gif {
+            width: 90px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid #fde047;
+            margin: 8px auto;
+            box-shadow: 0 0 15px rgba(253, 224, 71, 0.4);
+        }
+
+        .btn-evade {
+            position: absolute;
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.1s ease;
+            font-size: 0.9rem;
+        }
+
+        /* Spin Wheel Modal */
+        .wheel-container {
+            position: relative;
+            width: 240px;
+            height: 240px;
+            margin: 10px auto;
+        }
+
+        #wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 4px solid #fde047;
+            box-shadow: 0 0 25px rgba(253, 224, 71, 0.6);
+            transition: transform 4s cubic-bezier(0.15, 0.75, 0.1, 1);
+        }
+
+        .wheel-pointer {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 22px solid #ef4444;
+            z-index: 20;
+        }
+
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(3, 7, 18, 0.85);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .modal-content {
+            background: #1e1b4b;
+            border: 2px solid #fde047;
+            padding: 20px;
+            border-radius: 20px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 0 30px rgba(253, 224, 71, 0.3);
+            text-align: center;
+        }
+
+        /* Result Popup Frame Styling */
+        .result-frame {
+            background: linear-gradient(135deg, #31103f, #1e1b4b);
+            border: 3px solid #fde047;
+            padding: 25px;
+            border-radius: 25px;
+            max-width: 340px;
+            width: 90%;
+            box-shadow: 0 0 40px rgba(253, 224, 71, 0.6);
+            text-align: center;
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .result-title {
+            color: #fde047;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(253, 224, 71, 0.5);
+        }
+
+        .result-amount {
+            font-size: 1.8rem;
+            color: #ffffff;
+            font-weight: bold;
+            margin: 15px 0;
+            background: rgba(254, 240, 138, 0.15);
+            padding: 10px;
+            border-radius: 15px;
+            border: 1px dashed #fde047;
+            text-shadow: 0 0 12px rgba(254, 240, 138, 0.8);
+        }
+
+        /* Music Player Bar */
+        .music-player {
+            position: fixed;
+            bottom: 15px;
+            right: 15px;
+            z-index: 99;
+            background: rgba(30, 27, 75, 0.8);
+            border: 1px solid #fde047;
+            padding: 8px 12px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        .music-player span {
+            font-size: 0.8rem;
+            color: #fde047;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="lanternCanvas"></canvas>
+
+    <!-- Background Music -->
+    <audio id="bgMusic" loop>
+        <source src="foru.mp3" type="audio/ogg">
+    </audio>
+
+    <div class="music-player">
+        <span>🎵 သီချင်းဖွင့်ရန်</span>
+        <button class="btn" style="padding: 4px 10px; font-size: 0.8rem;" onclick="toggleMusic()">ဖွင့်မည် / ပိတ်မည်</button>
+    </div>
+
+    <div class="container">
+
+        <!-- PAGE 1: Centered Moon + Right Side Text & Smooth Envelope Exit / Message Entrance -->
+        <div class="page active" id="page1">
+            <div class="card-section">
+                
+                <!-- Moon Centered with Right Side Text (No Emoji) -->
+                <div class="moon-container-row" onclick="triggerBeautifulFireworks(event)">
+                    <div class="moon-large"></div>
+                    <div class="moon-side-text">လမင်းကြီးကို နှိပ်ပါ</div>
+                </div>
+
+                <h1>သီတင်းကျွတ် အမှတ်တရ စာလွှာ 🪔</h1>
+
+                <!-- Envelope that slides down and disappears -->
+                <div class="envelope-container" id="envelopeWrapper" onclick="openAndHideEnvelopeSmooth()">
+                    <div class="envelope">
+                        <div class="envelope-flap"></div>
+                        <div class="envelope-label">✉️ စာအိတ်ကို နှိပ်ပါ</div>
+                    </div>
+                </div>
+
+                <!-- Secret Message slides in smoothly -->
+                <div class="secret-message" id="letterContent">
+                    သီတင်းကျွတ်လပြည့်ညမှာ အတူတူရှိမပေးနိုင်လို့ ဒါလေးကိုအမှတ်တရအနေနဲ့ ပို့ပေးလိုက်ပါတယ် နောက် သီတင်းကျွတ်တွေတူတူရှိနိုင်အောင် ကြိုးစားပါ့မယ်နော် အရမ်းချစ်တယ်နော် သဲ"💞
+                </div>
+
+                <div class="nav-btn-container" style="justify-content: flex-end; margin-top: 15px;">
+                    <button class="nav-btn" onclick="changePage(2)">နောက်တစ်ခု သို့ ➔</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE 2: Realistic SVG Sky Lantern (Smooth and Steady Floating) -->
+        <div class="page" id="page2">
+            <div class="card-section">
+                <h1>🏮 မီးပုံးပျံ ဆုတောင်းစာ လွှတ်ရန်</h1>
+                <p class="subtitle">ဆုတောင်းချင်တာလေး ရေးပြီး မီးပုံးပျံလွှတ်တင်လိုက်ပါ...</p>
+                
+                <input type="text" id="wishInput" placeholder="ဒီမှာ ဆုတောင်းစာ ရေးပါ...">
+                <br>
+                <button class="btn" onclick="launchRealLantern()">မီးပုံးပျံ လွှတ်မည် ✨</button>
+
+                <div class="nav-btn-container">
+                    <button class="nav-btn" onclick="changePage(1)">⬅ ရှေ့သို့</button>
+                    <button class="nav-btn" onclick="changePage(3)">နောက်တစ်ခု သို့ ➔</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE 3: Cute GIF & Enhanced Spin Wheel -->
+        <div class="page" id="page3">
+            <div class="card-section game-box" id="gameArea">
+                <h1>🧧 သီတင်းကျွတ် မုန့်ဖိုး</h1>
+                <img src="love.webp" alt="Cute GIF" class="cute-gif">
+                <p class="subtitle">သီတင်းကျွတ်မုန့်ဖိုးပေးမယ် ယူမှာလား🙄💞</p>
+                
+                <div style="margin-top: 10px;">
+                    <button class="btn" onclick="openWheelModal()">ယူမယ် </button>
+                    <button class="btn-evade" id="noBtn" onmouseover="evadeButton()">မယူပါ</button>
+                </div>
+
+                <div class="nav-btn-container" style="margin-top: 35px;">
+                    <button class="nav-btn" onclick="changePage(2)">⬅ ရှေ့သို့</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Spin Wheel Modal -->
+    <div class="modal" id="wheelModal">
+        <div class="modal-content">
+            <h2 style="color: #fde047; font-size: 1.4rem;">🎰 သီတင်းကျွတ် မုန့်ဖိုး Spin Wheel</h2>
+            <div class="wheel-container">
+                <div class="wheel-pointer"></div>
+                <canvas id="wheel" width="240" height="240"></canvas>
+            </div>
+            <button class="btn" id="spinBtn" onclick="spinWheel()" style="margin-top: 5px;">လှည့်မည် 🎯</button>
+            <button class="btn" style="background: #64748b; margin-left: 8px; margin-top: 5px;" onclick="closeWheelModal()">ပိတ်မည်</button>
+        </div>
+    </div>
+
+    <!-- Spin Result Frame Modal -->
+    <div class="modal" id="resultModal">
+        <div class="result-frame">
+            <div class="result-title">🪔 သီတင်းကျွတ်မုန့်ဖိုး 🪔</div>
+            <div class="result-amount" id="resultTextDisplay">၁၀၀၀၀ ကျပ်</div>
+            <p id="resultDescDisplay" style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 15px;">ကိုကို ပေးတဲ့ မုန့်ဖိုးလေး❤️</p>
+            <button class="btn" onclick="closeResultModal()">ကျေးဇူးတင်ပါတယ် 💖</button>
+        </div>
+    </div>
+
+    <script>
+        // 1. Smooth Page Transition Navigation System
+        function changePage(pageNum) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            setTimeout(() => {
+                document.getElementById(`page${pageNum}`).classList.add('active');
+            }, 200);
+        }
+
+        // 2. Background Lantern Canvas & Realistic Fireworks Script
+        const canvas = document.getElementById('lanternCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        let lanterns = [];
+        for(let i = 0; i < 18; i++) {
+            lanterns.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height + canvas.height,
+                w: Math.random() * 10 + 16,
+                h: Math.random() * 14 + 22,
+                speed: Math.random() * 0.7 + 0.3,
+                drift: Math.random() * 0.5 - 0.25
+            });
+        }
+
+        let fireworks = [];
+
+        function drawLanternShape(x, y, w, h) {
+            ctx.save();
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = '#fde047';
+
+            ctx.fillStyle = '#f97316';
+            ctx.beginPath();
+            ctx.moveTo(x - w/2, y - h/2);
+            ctx.lineTo(x + w/2, y - h/2);
+            ctx.lineTo(x + w/3, y + h/2);
+            ctx.lineTo(x - w/3, y + h/2);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.fillStyle = '#fef08a';
+            ctx.beginPath();
+            ctx.arc(x, y, w/4, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        // Professional Realistic Fireworks Generator (Shows on Top of Frame Card)
+        function triggerBeautifulFireworks(e) {
+            const startX = e ? e.clientX : canvas.width / 2;
+            const startY = e ? e.clientY : canvas.height / 3;
+            const colors = ['#fde047', '#ff4d4d', '#38bdf8', '#34d399', '#f472b6', '#fb923c', '#c084fc'];
+
+            for (let b = 0; b < 3; b++) {
+                const burstX = startX + (Math.random() * 120 - 60);
+                const burstY = startY + (Math.random() * 80 - 40);
+                const chosenColor = colors[Math.floor(Math.random() * colors.length)];
+
+                for (let i = 0; i < 90; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * 8 + 2;
+                    fireworks.push({
+                        x: burstX,
+                        y: burstY,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        color: chosenColor,
+                        alpha: 1,
+                        decay: Math.random() * 0.012 + 0.008,
+                        size: Math.random() * 4 + 2
+                    });
+                }
+            }
+        }
+
+        function animateCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Floating Lanterns
+            lanterns.forEach(l => {
+                drawLanternShape(l.x, l.y, l.w, l.h);
+                l.y -= l.speed;
+                l.x += l.drift;
+
+                if (l.y < -30) {
+                    l.y = canvas.height + 30;
+                    l.x = Math.random() * canvas.width;
+                }
+            });
+
+            // Fireworks Sparks
+            fireworks.forEach((p, index) => {
+                ctx.save();
+                ctx.globalAlpha = p.alpha;
+                ctx.fillStyle = p.color;
+                ctx.shadowBlur = 12;
+                ctx.shadowColor = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.04;
+                p.vx *= 0.97;
+                p.vy *= 0.97;
+                p.alpha -= p.decay;
+
+                if (p.alpha <= 0) {
+                    fireworks.splice(index, 1);
+                }
+            });
+
+            requestAnimationFrame(animateCanvas);
+        }
+        animateCanvas();
+
+        // 3. Smooth Envelope Exit & Message Entrance Animation
+        function openAndHideEnvelopeSmooth() {
+            const env = document.getElementById('envelopeWrapper');
+            const letter = document.getElementById('letterContent');
+
+            env.classList.add('hide-envelope');
+            setTimeout(() => {
+                letter.classList.add('show');
+            }, 300);
+        }
+
+        // Helper function to format wish text into multi-lines if too long
+        function formatWishText(text) {
+            if (text.length <= 18) return text;
+            const mid = Math.floor(text.length / 2);
+            let breakIdx = text.indexOf(' ', mid);
+            if (breakIdx === -1) breakIdx = text.lastIndexOf(' ', mid);
+            if (breakIdx === -1) breakIdx = mid;
+            return text.substring(0, breakIdx) + '<br>' + text.substring(breakIdx + 1);
+        }
+
+        // 4. Page 2 Realistic SVG Lantern Launcher (With Multi-Line Text Wrapping)
+        function launchRealLantern() {
+            const rawText = document.getElementById('wishInput').value.trim();
+            if (rawText === '') {
+                alert('ဆုတောင်းစာလေး ရိုက်ထည့်ပေးပါဦးနော်!');
+                return;
+            }
+
+            const formattedText = formatWishText(rawText);
+
+            const lantern = document.createElement('div');
+            lantern.className = 'real-flying-lantern';
+            lantern.style.left = `${Math.random() * 50 + 25}%`;
+            lantern.style.bottom = '20px';
+
+            lantern.innerHTML = `
+                <svg width="90" height="120" viewBox="0 0 100 130" style="filter: drop-shadow(0 0 25px #fde047);">
+                    <ellipse cx="50" cy="55" rx="42" ry="48" fill="url(#lanternGrad)" stroke="#ca8a04" stroke-width="2"/>
+                    <rect x="42" y="3" width="16" height="8" rx="2" fill="#78350f"/>
+                    <rect x="36" y="103" width="28" height="12" rx="2" fill="#78350f"/>
+                    <circle cx="50" cy="55" r="15" fill="#fef08a" opacity="0.9"/>
+                    <defs>
+                        <radialGradient id="lanternGrad" cx="50%" cy="40%" r="60%">
+                            <stop offset="0%" stop-color="#fef08a"/>
+                            <stop offset="50%" stop-color="#f97316"/>
+                            <stop offset="100%" stop-color="#c2410c"/>
+                        </radialGradient>
+                    </defs>
+                </svg>
+                <div class="lantern-wish-tag-huge" style="background: rgba(254, 240, 138, 1); color: #451a03; font-size: 0.85rem; font-weight: bold; padding: 6px 12px; border-radius: 12px; margin-top: 6px; text-align: center; line-height: 1.4; max-width: 180px; word-break: break-word; box-shadow: 0 4px 15px rgba(0,0,0,0.6); border: 1.5px solid #ca8a04; opacity: 1;">${formattedText}</div>
+            `;
+
+            document.body.appendChild(lantern);
+
+            setTimeout(() => {
+                lantern.remove();
+            }, 8000);
+
+            document.getElementById('wishInput').value = '';
+        }
+
+        // 5. Page 3 Button Evasion
+        function evadeButton() {
+            const btn = document.getElementById('noBtn');
+            const gameBox = document.getElementById('gameArea');
+            const rect = gameBox.getBoundingClientRect();
+
+            const newX = Math.random() * (rect.width - 90);
+            const newY = Math.random() * (rect.height - 40);
+
+            btn.style.left = `${newX}px`;
+            btn.style.top = `${newY}px`;
+        }
+
+        // 6. Enhanced Spin Wheel Logic (True Random & Multi-line Support)
+        const items = ['10000', '20000', 'မရပါ', '50', '5000', '3000'];
+        const colors = ['#f59e0b', '#ec4899', '#3b82f6', '#10b981', '#8b5cf6', '#e11d48'];
+        const wheelCanvas = document.getElementById('wheel');
+        const wCtx = wheelCanvas.getContext('2d');
+        let currentRotation = 0;
+        let isSpinning = false;
+
+        function drawWheel() {
+            const numSegments = items.length;
+            const anglePerSeg = (2 * Math.PI) / numSegments;
+            const center = 120;
+            const radius = 115;
+
+            wCtx.clearRect(0, 0, 240, 240);
+
+            for (let i = 0; i < numSegments; i++) {
+                wCtx.beginPath();
+                wCtx.fillStyle = colors[i];
+                wCtx.moveTo(center, center);
+                wCtx.arc(center, center, radius, i * anglePerSeg, (i + 1) * anglePerSeg);
+                wCtx.fill();
+                wCtx.strokeStyle = '#fde047';
+                wCtx.lineWidth = 2;
+                wCtx.stroke();
+
+                wCtx.save();
+                wCtx.translate(center, center);
+                wCtx.rotate(i * anglePerSeg + anglePerSeg / 2);
+                wCtx.textAlign = "right";
+                wCtx.fillStyle = "#fff";
+                wCtx.font = "bold 14px Padauk, sans-serif";
+                wCtx.fillText(items[i], radius - 15, 5);
+                wCtx.restore();
+            }
+        }
+        drawWheel();
+
+        function openWheelModal() {
+            document.getElementById('wheelModal').style.display = 'flex';
+        }
+        function closeWheelModal() {
+            document.getElementById('wheelModal').style.display = 'none';
+        }
+
+        function spinWheel() {
+            if (isSpinning) return;
+            isSpinning = true;
+
+            // Truly Random Index Selection
+            const selectedIndex = Math.floor(Math.random() * items.length);
+            const numSegments = items.length;
+            const segmentDegrees = 360 / numSegments;
+
+            const targetAngle = 360 - (selectedIndex * segmentDegrees) - (segmentDegrees / 2) - 90;
+            const extraRounds = 360 * (6 + Math.floor(Math.random() * 4)); // Random extra rotations
+            const totalRotation = currentRotation + extraRounds + (targetAngle - (currentRotation % 360));
+
+            currentRotation = totalRotation;
+            wheelCanvas.style.transform = `rotate(${totalRotation}deg)`;
+
+            setTimeout(() => {
+                isSpinning = false;
+                const resultText = items[selectedIndex];
+                
+                const resultModal = document.getElementById('resultModal');
+                const textDisplay = document.getElementById('resultTextDisplay');
+                const descDisplay = document.getElementById('resultDescDisplay');
+
+                if (resultText === 'မရပါ') {
+                    textDisplay.innerText = `မုန့်ဖိုး "မရပါ" 😜`;
+                    descDisplay.innerText = `နောက်တစ်ခါ ထပ်လှည့်ကြည့်ပါဦးနော်!`;
+                } else if (resultText === '50') {
+                    textDisplay.innerText = `50 ကျပ် 🪙`;
+                    descDisplay.innerText = `သီတင်းကျွတ်မုန့်ဖိုး 50 ကျပ် တဲ့ hee" ❤️`;
+                } else {
+                    textDisplay.innerText = `${resultText} ကျပ် 🎉`;
+                    descDisplay.innerText = `သီတင်းကျွတ်မုန့်ဖိုး ရရှိသွားပါပြီ! 💖`;
+                }
+
+                resultModal.style.display = 'flex';
+            }, 4000);
+        }
+
+        function closeResultModal() {
+            document.getElementById('resultModal').style.display = 'none';
+            closeWheelModal();
+        }
+
+        // 7. Music Control
+        let isMusicPlaying = false;
+        function toggleMusic() {
+            const music = document.getElementById('bgMusic');
+            if (isMusicPlaying) {
+                music.pause();
+                isMusicPlaying = false;
+            } else {
+                music.play().catch(() => {});
+                isMusicPlaying = true;
+            }
+        }
+    </script>
+</body>
+</html>
