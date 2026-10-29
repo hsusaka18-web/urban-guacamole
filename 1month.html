@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Happy Anniversary!</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&family=Poppins:wght@600;700;800&display=swap');
+    
+    body {
+      font-family: 'Padauk', 'Poppins', sans-serif;
+      background-color: #fce4ec; /* Soft pink background */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 10px;
+    }
+
+    /* Main Container Frame */
+    .app-card {
+      background-color: #dcedc8; /* Mint green frame */
+      border-radius: 28px;
+      padding: 20px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      position: relative;
+      min-height: 580px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    /* Floating Music Button */
+    .music-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      width: 45px;
+      height: 45px;
+      background-color: #c8e6c9;
+      border: 2px solid #a5d6a7;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #1b5e20;
+      cursor: pointer;
+      z-index: 50;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    .spin-music {
+      animation: spin 3s linear infinite;
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Page Switching Animation */
+    .page {
+      display: none;
+      width: 100%;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .page.active {
+      display: flex;
+      animation: fadeInScale 0.4s ease-in-out forwards;
+    }
+
+    @keyframes fadeInScale {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    /* Rounded Image Styles */
+    .profile-img-dashed {
+      width: 170px;
+      height: 170px;
+      border-radius: 24px;
+      border: 3px dashed #81c784;
+      object-fit: cover;
+      padding: 4px;
+      background-color: #fff;
+    }
+
+    .profile-img-circle {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      border: 3px dashed #81c784;
+      object-fit: cover;
+      padding: 4px;
+      background-color: #fff;
+    }
+
+    /* Keypad Buttons with Light Green Circles */
+    .keypad-btn {
+      width: 60px;
+      height: 60px;
+      background-color: white;
+      border: 2.5px solid #a5d6a7; /* Green outer ring */
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #2e7d32;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      transition: transform 0.1s, background-color 0.2s;
+    }
+
+    .keypad-btn:active {
+      transform: scale(0.92);
+      background-color: #e8f5e9;
+    }
+
+    /* Action & Back Buttons */
+    .nav-btn {
+      background-color: #a5d6a7;
+      color: #1b5e20;
+      font-weight: bold;
+      padding: 8px 26px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      transition: all 0.2s;
+    }
+
+    .nav-btn:hover {
+      background-color: #81c784;
+    }
+
+    /* Wheel Container & Canvas with Outer Green Border Ring */
+    .wheel-wrapper {
+      position: relative;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      border: 6px solid #81c784; /* Green outer ring around spin wheel */
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: white;
+    }
+
+    #wheelCanvas {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      transition: transform 6s cubic-bezier(0.1, 0.99, 0.2, 1);
+    }
+
+    /* Game Canvas Wrapper */
+    .game-container {
+      position: relative;
+      width: 280px;
+      height: 280px;
+    }
+
+    #gameCanvas {
+      background-color: #ffffff;
+      border-radius: 16px;
+      border: 2px solid #e0e0e0;
+      touch-action: none;
+    }
+
+    /* Feedback Text Animation on Catching Heart */
+    .feedback-text {
+      position: absolute;
+      top: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(255, 255, 255, 0.9);
+      color: #d81b60;
+      font-weight: bold;
+      font-size: 1rem;
+      padding: 4px 14px;
+      border-radius: 20px;
+      border: 2px solid #f48fb1;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      pointer-events: none;
+      animation: floatUpFade 1.2s ease-out forwards;
+      z-index: 10;
+    }
+
+    @keyframes floatUpFade {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, 10px) scale(0.8);
+      }
+      20% {
+        opacity: 1;
+        transform: translate(-50%, 0) scale(1.1);
+      }
+      80% {
+        opacity: 1;
+        transform: translate(-50%, -5px) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -20px) scale(0.9);
+      }
+    }
+
+    /* Passcode Asterisks (*) */
+    .passcode-input {
+      font-size: 1.6rem;
+      font-weight: 600;
+      letter-spacing: 0.35rem;
+      color: #1b5e20;
+    }
+
+    /* Title Font styling */
+    .enter-passcode-title {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 800;
+      color: #1b5e20;
+      letter-spacing: 0.05em;
+    }
+
+    /* Alphabet 'T' Gallery Layout Styles */
+    .t-gallery-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 280px;
+      margin: 0 auto 1.5rem auto;
+    }
+
+    .t-top-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      width: 100%;
+      margin-bottom: 8px;
+    }
+
+    .t-vertical-stem {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      width: 33.33%;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Audio Element for Daylight Music -->
+  <audio id="bgMusic" src="wannabe.mp3" loop preload="auto"></audio>
+
+  <div class="app-card">
+    
+    <!-- Music Button -->
+    <div class="music-btn" id="musicBtn" onclick="toggleAudio()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+      </svg>
+    </div>
+
+    <!-- PAGE 1: PASSCODE LOCK SCREEN -->
+    <div id="page1" class="page active">
+      <img src="g.jpg" class="profile-img-dashed mb-4" alt="Couple Image">
+      <h2 class="enter-passcode-title text-lg mb-2">ENTER PASSCODE</h2>
+      
+      <div class="bg-white px-6 py-2 rounded-full w-3/4 mb-4 shadow-inner text-center border-2 border-green-300">
+        <input type="text" id="passcodeDisplay" readonly value="" class="text-center passcode-input bg-transparent outline-none w-full" placeholder="----">
+      </div>
+
+      <!-- Styled Error Box for Wrong Passcode -->
+      <div id="errorMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-1.5 rounded-full font-bold text-sm mb-2 opacity-0 transition-opacity shadow-sm">
+        Oops, wrong passcode! ❎
+      </div>
+
+      <div class="grid grid-cols-3 gap-3">
+        <button class="keypad-btn" onclick="pressKey('1')">1</button>
+        <button class="keypad-btn" onclick="pressKey('2')">2</button>
+        <button class="keypad-btn" onclick="pressKey('3')">3</button>
+        <button class="keypad-btn" onclick="pressKey('4')">4</button>
+        <button class="keypad-btn" onclick="pressKey('5')">5</button>
+        <button class="keypad-btn" onclick="pressKey('6')">6</button>
+        <button class="keypad-btn" onclick="pressKey('7')">7</button>
+        <button class="keypad-btn" onclick="pressKey('8')">8</button>
+        <button class="keypad-btn" onclick="pressKey('9')">9</button>
+        <button class="keypad-btn" onclick="pressKey('.')">.</button>
+        <button class="keypad-btn" onclick="pressKey('0')">0</button>
+        <button class="keypad-btn text-xs text-red-500 font-extrabold" onclick="deleteKey()">DEL</button>
+      </div>
+    </div>
+
+    <!-- PAGE 2: SEARCH PROMPT -->
+    <div id="page2" class="page">
+      <img src="d.jpg" class="profile-img-circle my-6" alt="Couple Circle">
+      
+      <div class="bg-white rounded-full px-5 py-3 w-full flex items-center justify-between shadow-sm border border-green-200 my-4">
+        <span class="text-gray-600 text-sm truncate pr-2">How long have we been together...</span>
+        <button onclick="goToPage(3)" class="text-green-700 hover:scale-110 transition-transform flex-shrink-0 cursor-pointer">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </button>
+      </div>
+
+      <p class="text-green-800 font-semibold mt-4">မှန်ဘီလူး (🔍) ပုံစံလေးကို နှိပ်ပါ။</p>
+    </div>
+
+    <!-- PAGE 3: TIMER PAGE -->
+    <div id="page3" class="page">
+      <img src="b.jpg" class="profile-img-dashed my-4" alt="Anni Image">
+
+      <div class="bg-white rounded-2xl p-4 w-full border border-green-200 shadow-sm my-4">
+        <div class="grid grid-cols-4 text-center divide-x divide-gray-200">
+          <div>
+            <div id="days" class="text-green-700 font-bold text-xl">30</div>
+            <div class="text-xs text-gray-500">Days</div>
+          </div>
+          <div>
+            <div id="hours" class="text-green-700 font-bold text-xl">720</div>
+            <div class="text-xs text-gray-500">Hrs</div>
+          </div>
+          <div>
+            <div id="minutes" class="text-green-700 font-bold text-xl">1440</div>
+            <div class="text-xs text-gray-500">Mins</div>
+          </div>
+          <div>
+            <div id="seconds" class="text-green-700 font-bold text-sm leading-5 pt-1">2592000</div>
+            <div class="text-xs text-gray-500">Secs</div>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="goToPage(4)" class="w-12 h-12 bg-green-400 rounded-full flex items-center justify-center text-white text-xl shadow-md mt-2 hover:bg-green-500">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </button>
+    </div>
+
+    <!-- PAGE 4: MAIN MENU NAVIGATION -->
+    <div id="page4" class="page">
+      <div class="bg-green-200 rounded-2xl p-6 w-full text-center shadow-sm mb-8 mt-4">
+        <h3 class="text-green-900 font-bold text-lg">တစ်ခုချင်းစီအေးဆေးကြည့်နော် "မမပိစိလေး"💞</h3>
+      </div>
+
+      <div class="flex justify-around w-full mt-6">
+        <!-- Message Icon -->
+        <button onclick="goToPage(5)" class="w-16 h-16 bg-white rounded-full flex items-center justify-center text-green-700 shadow-md border border-green-100 hover:scale-105">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/>
+          </svg>
+        </button>
+        
+        <!-- Camera Icon -->
+        <button onclick="goToPage(6)" class="w-16 h-16 bg-white rounded-full flex items-center justify-center text-green-700 shadow-md border border-green-100 hover:scale-105">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 15c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3zm9-9h-3.17L16 4H8L6.17 6H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-9 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
+          </svg>
+        </button>
+
+        <!-- Game Icon -->
+        <button onclick="goToPage(7)" class="w-16 h-16 bg-white rounded-full flex items-center justify-center text-green-700 shadow-md border border-green-100 hover:scale-105">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H9v2H7v-2H5v-2h2V9h2v2h2v2zm4.5 1c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm3-3c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- PAGE 5: LOVE LETTER PAGE (BACK BUTTON AT BOTTOM) -->
+    <div id="page5" class="page">
+      <div class="bg-white rounded-2xl p-5 w-full border border-green-200 text-left text-gray-700 text-sm leading-relaxed max-h-[440px] overflow-y-auto shadow-inner mb-4">
+        <p class="text-base text-green-900 font-bold mb-2"> Happy 1month prr "bby" layyy yayyy🫶💞</p>
+        <p class="mb-3">ဘာလိုလိုနဲ့၁လတောင်ပြည့်သွားပီနော်ဒီကြားထဲမှာပြဿနာလေးတွေရှိခဲ့တဲ့အတွက်မောင်မောင့်"ဘက်ကမှားတာရှိရင်အရင်တောင်းပန်ပါတယ်နော်ကလေး"👉👈💕
+        </p>
+        <p class="mb-3">
+          မမ"ပိစိလေးကိုအရင်လိုအချိန်မပေးနိုင်တော့တာကိုလဲနားလည်ပေးပါနော်မောင်မောင်"တို့ နှစ်တွေအကြာရီးအတူတူရှိသွားကြမယ်နော် တကယ်လိုစိတ်တွေဆိုးပြီးပြတ်မယ်လိုမပြောကြေးနော်ပြောမိသွားရင်လဲအဲ့ဒါအတည်မဟုတ်ဘူးနော် မမ"ပိစိလေး
+        </p>
+        <p class="mb-4">"မမ"မှာအဆင်မပြေတာလေးတွေရှိရင်မောင်မောင့်"ကိုပြောပြနော်ပီးတော့
+မောင်မောင့်"ကိုလဲဒီထပ်ပိုပီးချစ်ပေးသွားပါအုန်းနော် အစမိုလို့အရမ်းချစ်ပြနေတယ်မထင်ပါနဲ့နော် တစ်နေ့ထက်တစ်နေ့ပို"ပီးချစ်လားအုန်းမှာ
+        </p>
+        <p>"1 Month<br>
+30days<br>
+720hours<br>
+1440minutes<br>
+2592000seconds<br>
+I Always Love You".......💞💞💞</p>
+        <div class="text-right font-bold text-gray-800 mt-6">
+          <p class="text-base mb-1">30.10.2026 🗓️</p>
+        </div>
+      </div>
+
+      <!-- Back button positioned at the bottom center -->
+      <button onclick="goToPage(4)" class="nav-btn my-2">
+        ◀◀ Back
+      </button>
+    </div>
+
+    <!-- PAGE 6: GALLERY (OUR MEMORIES - ALPHABET 'T' LAYOUT) -->
+    <div id="page6" class="page">
+      <h3 class="text-green-800 font-bold text-lg mb-3 flex items-center justify-center gap-2">
+        Our Memories 📸
+      </h3>
+
+      <!-- 'T' Shape Layout Container -->
+      <div class="t-gallery-container">
+        <!-- Top Horizontal Row of 'T' (3 Images) -->
+        <div class="t-top-row">
+          <img src="d.jpg" class="w-full h-20 object-cover rounded-xl shadow-sm" alt="Mem 1">
+          <img src="e.jpg" class="w-full h-20 object-cover rounded-xl shadow-sm" alt="Mem 2">
+          <img src="f.jpg" class="w-full h-20 object-cover rounded-xl shadow-sm" alt="Mem 3">
+        </div>
+        
+        <!-- Vertical Stem of 'T' (3 Images) -->
+        <div class="t-vertical-stem">
+          <img src="h.jpg" class="w-full h-20 object-cover rounded-xl shadow-sm" alt="Mem 4">
+          <img src="g.jpg" class="w-full h-20 object-cover rounded-xl shadow-sm" alt="Mem 5">
+          <img src="a.jpg" class="w-full h-20 object-cover rounded-xl shadow-sm" alt="Mem 6">
+        </div>
+      </div>
+
+      <button onclick="goToPage(4)" class="nav-btn">
+        ◀◀ Back
+      </button>
+    </div>
+
+    <!-- PAGE 7: CATCH HEARTS GAME -->
+    <div id="page7" class="page">
+      <div class="bg-pink-200 text-pink-800 font-bold px-6 py-2 rounded-xl mb-3 text-lg">
+        အမှတ်ပြည့် <span id="score">0</span> / 10
+      </div>
+
+      <div class="game-container">
+        <canvas id="gameCanvas" width="280" height="280"></canvas>
+        <div id="gameFeedbackContainer"></div>
+      </div>
+
+      <div class="mt-3">
+        <button id="startGameBtn" onclick="startGame()" class="bg-pink-500 text-white font-bold px-6 py-2 rounded-full shadow hover:bg-pink-600 mb-2">
+          ဂိမ်းစတင်ရန် 🎮
+        </button>
+      </div>
+
+      <p class="text-xs text-pink-700 font-medium my-2">❤️ အသည်းပုံကို ယုန်လေးဖြင့် ဆွဲယူဖမ်းပါ</p>
+
+      <button onclick="goToPage(4)" class="nav-btn mt-2">
+        ◀◀ Back
+      </button>
+    </div>
+
+    <!-- PAGE 8: GAME COMPLETED -->
+    <div id="page8" class="page">
+      <div class="bg-pink-200 text-pink-800 font-bold px-6 py-2 rounded-xl mb-3 text-lg">
+        အမှတ်ပြည့် 10 / 10
+      </div>
+
+      <div class="bg-white rounded-2xl w-[280px] h-[280px] flex flex-col justify-center items-center relative border border-gray-200 shadow-inner">
+        <div class="text-pink-500 font-bold text-xl mb-4 flex items-center gap-1">
+          တော်တယ်! 💖 🔥
+        </div>
+        <div class="text-6xl">🐰</div>
+      </div>
+
+      <button onclick="goToPage(9)" class="bg-pink-500 text-white font-bold px-6 py-3 rounded-full shadow-lg hover:bg-pink-600 my-4 text-base flex items-center gap-2">
+        Spin Wheel လှည့်ရန် ➔
+      </button>
+
+      <button onclick="goToPage(4)" class="nav-btn">
+        ◀◀ Back
+      </button>
+    </div>
+
+    <!-- PAGE 9: SPIN WHEEL -->
+    <div id="page9" class="page">
+      <h3 class="text-green-800 font-bold text-base mb-3">
+        anniversary gift အတွက်ရွေးပါ ✨
+      </h3>
+
+      <div class="relative my-2 flex justify-center items-center">
+        <!-- Pointer Arrow -->
+        <div class="absolute -top-3 z-30 w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-t-[18px] border-t-gray-800"></div>
+        
+        <!-- Wheel Outer Ring Wrapper -->
+        <div class="wheel-wrapper">
+          <canvas id="wheelCanvas" width="280" height="280"></canvas>
+          <button onclick="spinWheel()" class="absolute w-14 h-14 bg-gray-800 text-white font-bold rounded-full border-2 border-white shadow-lg flex justify-center items-center text-sm z-20 cursor-pointer hover:scale-105 active:scale-95 transition-transform">
+            Spin
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-white border border-green-200 rounded-full px-6 py-1.5 text-green-800 font-semibold text-sm my-4">
+        အလယ်က spin ကို နှိပ်ပါ
+      </div>
+
+      <button onclick="goToPage(4)" class="nav-btn">
+        ◀◀ Back
+      </button>
+    </div>
+
+    <!-- PAGE 10: GIFT RESULT WITH QR CODE -->
+    <div id="page10" class="page">
+      <h3 class="text-green-800 font-bold text-lg mb-3">
+        You got this anniversary gift ✨
+      </h3>
+
+      <div class="bg-white rounded-2xl p-6 w-full border border-green-200 flex flex-col items-center shadow-sm mb-4">
+        <h4 id="giftResultText" class="text-green-800 font-bold text-xl mb-4 text-center">
+          Skin care ဝယ်ပေးရမယ်
+        </h4>
+      </div>
+
+      <button onclick="goToPage(9)" class="nav-btn">
+        ↻ Spin Again
+      </button>
+    </div>
+
+  </div>
+
+  <script>
+    /* Audio Handling Logic (Autoplay Fix) */
+    function startAudio() {
+      const audio = document.getElementById('bgMusic');
+      const musicBtn = document.getElementById('musicBtn');
+      if (audio.paused) {
+        audio.play().then(() => {
+          musicBtn.classList.add('spin-music');
+        }).catch(err => {
+          console.log("Audio play deferred for user interaction:", err);
+        });
+      }
+    }
+
+    function toggleAudio() {
+      const audio = document.getElementById('bgMusic');
+      const musicBtn = document.getElementById('musicBtn');
+      
+      if (audio.paused) {
+        audio.play();
+        musicBtn.classList.add('spin-music');
+      } else {
+        audio.pause();
+        musicBtn.classList.remove('spin-music');
+      }
+    }
+
+    // Screen ကို ပထမဆုံးတစ်ချက်နှိပ်လိုက်တာနဲ့ သီချင်းစတင်ဖွင့်ရန်
+    document.addEventListener('click', function initAudioOnInteraction() {
+      startAudio();
+      document.removeEventListener('click', initAudioOnInteraction);
+    }, { once: true });
+
+    /* Passcode Logic */
+    let currentPasscode = "";
+    const correctPasscode = "1012";
+
+    function pressKey(num) {
+      startAudio(); // Keypad နှိပ်ချိန်တွင် သီချင်းအလိုအလျောက်ဖွင့်မည်
+      if (currentPasscode.length < 4) {
+        currentPasscode += num;
+        updatePasscodeDisplay();
+      }
+      if (currentPasscode.length === 4) {
+        if (currentPasscode === correctPasscode) {
+          document.getElementById('errorMessage').classList.add('opacity-0');
+          setTimeout(() => {
+            goToPage(2);
+          }, 300);
+        } else {
+          document.getElementById('errorMessage').classList.remove('opacity-0');
+          setTimeout(() => {
+            currentPasscode = "";
+            updatePasscodeDisplay();
+          }, 800);
+        }
+      }
+    }
+
+    function deleteKey() {
+      currentPasscode = currentPasscode.slice(0, -1);
+      updatePasscodeDisplay();
+    }
+
+    function updatePasscodeDisplay() {
+      document.getElementById('passcodeDisplay').value = "*".repeat(currentPasscode.length);
+    }
+
+    /* Page Navigation */
+    function goToPage(pageNumber) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      const targetPage = document.getElementById(`page${pageNumber}`);
+      targetPage.classList.add('active');
+
+      if (pageNumber === 9) {
+        drawWheel();
+      }
+    }
+
+    /* Catch Hearts Game Logic */
+    let gameCanvas = document.getElementById('gameCanvas');
+    let ctx = gameCanvas.getContext('2d');
+    let score = 0;
+    let gameInterval = null;
+
+    let rabbit = { x: 120, y: 220, size: 40 };
+    let heart = { x: 130, y: 0, size: 24, speed: 3 };
+
+    // Feedback messages list for catching hearts
+    const catchMessages = [
+      "တော်တယ်! 💖",
+      "ဆက်ကြိုးစား! 💪",
+      "မိုက်တယ်! 🔥",
+      "အရမ်းတော်တယ်! ✨",
+      "Amazing! 😎",
+      "Cool 🌟",
+      "ဆက်ကြိုးစား! 💥",
+      "နောက်ထပ် ၂ လုံးပဲ! 🎯",
+      "နောက်ဆုံး ၁ လုံး! 🚀",
+      "အောင်မြင်ပြီ! 🎉"
+    ];
+
+    function showCatchFeedback(text) {
+      const container = document.getElementById('gameFeedbackContainer');
+      const el = document.createElement('div');
+      el.className = 'feedback-text';
+      el.innerText = text;
+      container.appendChild(el);
+
+      setTimeout(() => {
+        if (el.parentNode) {
+          el.parentNode.removeChild(el);
+        }
+      }, 1200);
+    }
+
+    function startGame() {
+      score = 0;
+      document.getElementById('score').innerText = score;
+      document.getElementById('startGameBtn').style.display = 'none';
+      heart.y = 0;
+      heart.x = Math.random() * (gameCanvas.width - 30);
+      
+      if (gameInterval) clearInterval(gameInterval);
+      gameInterval = setInterval(updateGame, 1000 / 60);
+    }
+
+    function updateGame() {
+      ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+
+      ctx.font = "24px serif";
+      ctx.fillText("💖", heart.x, heart.y);
+
+      ctx.font = "36px serif";
+      ctx.fillText("🐰", rabbit.x, rabbit.y);
+
+      heart.y += heart.speed;
+
+      if (
+        heart.y >= rabbit.y - 20 &&
+        heart.y <= rabbit.y + 20 &&
+        heart.x >= rabbit.x - 20 &&
+        heart.x <= rabbit.x + 30
+      ) {
+        score++;
+        document.getElementById('score').innerText = score;
+        
+        // Show feedback message for caught heart
+        showCatchFeedback(catchMessages[score - 1] || "တော်တယ်! 💖");
+
+        heart.y = 0;
+        heart.x = Math.random() * (gameCanvas.width - 30);
+
+        if (score >= 10) {
+          clearInterval(gameInterval);
+          setTimeout(() => {
+            goToPage(8);
+          }, 500);
+        }
+      }
+
+      if (heart.y > gameCanvas.height) {
+        heart.y = 0;
+        heart.x = Math.random() * (gameCanvas.width - 30);
+      }
+    }
+
+    function moveRabbit(e) {
+      let rect = gameCanvas.getBoundingClientRect();
+      let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      rabbit.x = clientX - rect.left - 20;
+    }
+
+    gameCanvas.addEventListener('mousemove', moveRabbit);
+    gameCanvas.addEventListener('touchmove', moveRabbit);
+
+    /* Spin Wheel Logic (5 Items Only - True Random Fix) */
+    const gifts = [
+      "Weekly pass 1 card",
+      "diamond100",
+      "arrbwar",
+      "မမလိုချင်တဲ့ဟာလေး",
+      "Next "
+    ];
+
+    const colors = [
+      "#ffe0b2", // Soft Peach Orange
+      "#d1c4e9", // Soft Lavender Purple
+      "#ffcdd2", // Pastel Pink
+      "#c8e6c9", // Pastel Mint Green
+      "#fff9c4"  // Soft Yellow
+    ];
+
+    let isSpinning = false;
+    let accumulatedRotation = 0;
+
+    function drawWheel() {
+      const canvas = document.getElementById('wheelCanvas');
+      const wheelCtx = canvas.getContext('2d');
+      const numSlices = gifts.length;
+      const sliceAngle = (2 * Math.PI) / numSlices;
+
+      wheelCtx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = 0; i < numSlices; i++) {
+        const angle = i * sliceAngle;
+        wheelCtx.beginPath();
+        wheelCtx.fillStyle = colors[i % colors.length];
+        wheelCtx.moveTo(140, 140);
+        wheelCtx.arc(140, 140, 140, angle, angle + sliceAngle);
+        wheelCtx.lineTo(140, 140);
+        wheelCtx.fill();
+
+        // Slice Text
+        wheelCtx.save();
+        wheelCtx.translate(140, 140);
+        wheelCtx.rotate(angle + sliceAngle / 2);
+        wheelCtx.textAlign = "right";
+        wheelCtx.fillStyle = "#333";
+        wheelCtx.font = "bold 11px Padauk, sans-serif";
+        wheelCtx.fillText(gifts[i], 125, 4);
+        wheelCtx.restore();
+      }
+    }
+
+    function spinWheel() {
+      if (isSpinning) return;
+      isSpinning = true;
+
+      const canvas = document.getElementById('wheelCanvas');
+      const numSlices = gifts.length;
+      const sliceDegree = 360 / numSlices;
+      
+      // True Random Selection
+      const selectedIndex = Math.floor(Math.random() * numSlices);
+      
+      // Calculate target angle to bring selected slice to top pointer (12 o'clock)
+      const sliceCenterDegree = (selectedIndex * sliceDegree) + (sliceDegree / 2);
+      const targetDegree = (270 - sliceCenterDegree + 360) % 360;
+      
+      const extraSpins = 360 * (10 + Math.floor(Math.random() * 5));
+      const currentMod = accumulatedRotation % 360;
+      const neededDegree = (targetDegree - currentMod + 360) % 360;
+
+      accumulatedRotation += extraSpins + neededDegree;
+      canvas.style.transform = `rotate(${accumulatedRotation}deg)`;
+
+      setTimeout(() => {
+        isSpinning = false;
+        document.getElementById('giftResultText').innerText = gifts[selectedIndex];
+        goToPage(10);
+      }, 6000);
+    }
+  </script>
+</body>
+</html>
